@@ -78,12 +78,19 @@
 <body class="font-khmer-body bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-rose-200 selection:text-rose-900">
 
     <!-- Supabase Integration Alert Banner (Disappears when Supabase URL is correctly filled) -->
-    <div id="supabase-status-banner" class="bg-gradient-to-r from-amber-500 to-orange-600 text-white py-2 px-4 text-center text-sm font-medium shadow-md flex items-center justify-center gap-2 relative z-50">
-        <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
-        <span>
-            <strong>របៀបសាកល្បង (Local Sandbox Demo)៖</strong> កំពុងប្រើប្រាស់ LocalStorage។ ដើម្បីប្រើប្រាស់ Supabase ពិតប្រាកដ សូមបំពេញ <code>SUPABASE_URL</code> និង <code>SUPABASE_ANON_KEY</code> នៅក្នុងកូដ។
-        </span>
-        <button id="close-banner-btn" class="ml-4 hover:opacity-80 transition py-0.5 px-2 bg-white/20 rounded text-xs">លាក់</button>
+    <div id="supabase-status-banner" class="bg-gradient-to-r from-amber-500 to-orange-600 text-white py-2 px-4 text-center text-sm font-medium shadow-md flex items-center justify-center gap-3 relative z-50 flex-wrap">
+        <div class="flex items-center gap-2">
+            <i data-lucide="database-backup" class="w-4 h-4 shrink-0 animate-bounce"></i>
+            <span>
+                <strong>របៀបសាកល្បង (Sandbox Demo Mode)៖</strong> កំពុងប្រើប្រាស់ LocalStorage។ ដើម្បីប្រើប្រាស់ Supabase ពិតប្រាកដ សូមបើកការតភ្ជាប់។
+            </span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="openSupabaseConfigModal()" class="cursor-pointer hover:bg-white hover:text-orange-600 active:scale-95 transition-all text-xs font-bold bg-white/25 py-1 px-3 rounded-lg flex items-center gap-1.5 shadow-sm">
+                <i data-lucide="plug-2" class="w-3.5 h-3.5"></i> រៀបចំការតភ្ជាប់ (Connect Supabase)
+            </button>
+            <button id="close-banner-btn" class="hover:opacity-80 transition py-1 px-2 border border-white/20 hover:bg-white/10 rounded-lg text-xs">លាក់</button>
+        </div>
     </div>
 
     <!-- MAIN HEADER & NAVIGATION -->
@@ -690,9 +697,12 @@
     <footer class="bg-white border-t border-rose-100 py-6 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
             <p class="text-xs text-slate-400 font-light">&copy; ២០២៦ ផ្កាស្លាសិរីមង្គល. All Wedding rights reserved. Designed for Cambodian Luxury Celebrations.</p>
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="text-xs text-slate-400 font-medium">ប្រព័ន្ធទិន្នន័យ៖</span>
                 <span id="footer-status-badge" class="bg-orange-50 text-orange-600 text-[10px] px-2.5 py-0.5 rounded border border-orange-100 font-bold uppercase transition duration-150">LocalStorage</span>
+                <button onclick="openSupabaseConfigModal()" class="cursor-pointer hover:bg-slate-100 hover:text-slate-800 transition text-[11px] font-bold text-slate-500 flex items-center gap-1 bg-slate-50 border border-slate-200/60 px-2 py-0.5 rounded-md shadow-sm">
+                    <i data-lucide="settings" class="w-3 h-3 text-slate-500"></i> កម្រងការកំណត់ (Configure Connection)
+                </button>
             </div>
         </div>
     </footer>
@@ -726,27 +736,113 @@
         </div>
     </div>
 
+    <!-- SUPABASE CONFIGURATION MODAL -->
+    <div id="supabase-config-modal" class="fixed inset-0 bg-slate-900/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 border-2 border-orange-500 shadow-xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2 text-rose-800">
+                    <i data-lucide="database" class="w-5 h-5 text-orange-500"></i>
+                    <h3 class="font-khmer-title text-base font-bold text-slate-800">ការកំណត់ការតភ្ជាប់ Supabase</h3>
+                </div>
+                <button onclick="closeSupabaseConfigModal()" class="text-slate-400 hover:text-slate-600 transition cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-500 leading-relaxed font-light">
+                សូមបំពេញព័ត៌មានខាងក្រោមដើម្បីភ្ជាប់ទៅកាន់គណនី Supabase របស់លោកអ្នកជាក់ស្តែង។ ព័ត៌មាននេះនឹងរក្សាទុកក្នុងទូរស័ព្ទ / កុំព្យូទ័ររបស់អ្នកដោយសុវត្ថិភាព (Local Secured Storage)។
+            </p>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1 text-left">Supabase URL :</label>
+                    <input type="text" id="config-supabase-url" placeholder="https://xxxxxxxxxxxxxx.supabase.co" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 bg-slate-50/50 text-slate-800">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1 text-left">Supabase Anon Key :</label>
+                    <input type="password" id="config-supabase-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 bg-slate-50/50 text-slate-800">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <button onclick="saveSupabaseConfig()" class="w-full py-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:opacity-95 text-white rounded-lg text-xs font-bold shadow transition cursor-pointer flex items-center justify-center gap-1.5">
+                    <i data-lucide="check" class="w-4 h-4"></i> រក្សាទុក និងភ្ជាប់
+                </button>
+                <button onclick="clearSupabaseConfig()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1.5">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> សម្អាតការកំណត់
+                </button>
+            </div>
+
+            <p class="text-[10px] text-center text-slate-400 border-t border-slate-50 pt-2.5">
+                * បន្ទាប់ពីចុចរក្សាទុក ប្រព័ន្ធនឹងដំណើរការឡើងវិញជាស្វ័យប្រវត្ត។
+            </p>
+        </div>
+    </div>
+
 
     <!-- ============================================ -->
     <!-- JAVASCRIPT SYSTEM ENGINE (VANILLA CORE) -->
     <!-- ============================================ -->
     <script>
         // -------------------------------------------------------------
-        // SUPABASE DATABASE CREDENTIALS (Vercel falls back / placeholded placeholders)
+        // SAFE WEB STORAGE ENGINE (With Memory Fallback for Sandboxed iFrames)
         // -------------------------------------------------------------
-        const SUPABASE_URL = window.env?.SUPABASE_URL || 'YOUR_SUPABASE_URL';
-        const SUPABASE_ANON_KEY = window.env?.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+        const _memStorage = {};
+        const appStorage = {
+            getItem: (key) => {
+                try {
+                    return localStorage.getItem(key);
+                } catch (e) {
+                    console.warn(`appStorage: Fail to read key "${key}" from localStorage. Using memory.`, e);
+                    return _memStorage[key] || null;
+                }
+            },
+            setItem: (key, val) => {
+                try {
+                    localStorage.setItem(key, val);
+                } catch (e) {
+                    console.warn(`appStorage: Fail to write key "${key}" to localStorage. Using memory.`, e);
+                    _memStorage[key] = String(val);
+                }
+            },
+            removeItem: (key) => {
+                try {
+                    localStorage.removeItem(key);
+                } catch (e) {
+                    console.warn(`appStorage: Fail to remove key "${key}" from localStorage. Using memory.`, e);
+                    delete _memStorage[key];
+                }
+            }
+        };
+
+        // -------------------------------------------------------------
+        // SUPABASE DATABASE CREDENTIALS (Vite Compiled and Injected)
+        // -------------------------------------------------------------
+        // Safely extract the compiled environment variables if resolved by Vite's define config
+        const injectedUrl = ('__VITE_SUPABASE_URL__' !== '__' + 'VITE_SUPABASE_URL__') && typeof __VITE_SUPABASE_URL__ !== 'undefined' ? __VITE_SUPABASE_URL__ : '';
+        const injectedKey = ('__VITE_SUPABASE_ANON_KEY__' !== '__' + 'VITE_SUPABASE_ANON_KEY__') && typeof __VITE_SUPABASE_ANON_KEY__ !== 'undefined' ? __VITE_SUPABASE_ANON_KEY__ : '';
+
+        let SUPABASE_URL = appStorage.getItem('MY_SUPABASE_URL') || injectedUrl || 'YOUR_SUPABASE_URL';
+        let SUPABASE_ANON_KEY = appStorage.getItem('MY_SUPABASE_ANON_KEY') || injectedKey || 'YOUR_SUPABASE_ANON_KEY';
+
+        // Check and sanitize raw placeholder values
+        if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_URL === '%VITE_SUPABASE_URL%' || SUPABASE_URL.trim() === '') {
+            SUPABASE_URL = '';
+        }
+        if (SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY' || SUPABASE_ANON_KEY === '%VITE_SUPABASE_ANON_KEY%' || SUPABASE_ANON_KEY.trim() === '') {
+            SUPABASE_ANON_KEY = '';
+        }
 
         let supabaseClient = null;
         let isMockDb = true;
 
         // Try initializing Supabase connection
-        if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
+        if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             try {
                 // Initialize using modern Supabase CDN Client
                 supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 isMockDb = false;
-                console.log("Supabase Connection Successfully Initialized!");
+                console.log("Supabase Connection Successfully Initialized using variables!");
             } catch (error) {
                 console.error("Failed to connect to Supabase. Reverting to Mock DB Sandbox.", error);
                 isMockDb = true;
@@ -754,6 +850,46 @@
         } else {
             console.log("Supabase credentials placeholder detected. Bootstrapping Sandbox LocalStorage DB.");
             isMockDb = true;
+        }
+
+        // -------------------------------------------------------------
+        // SUPABASE MANUAL CONFIG CORES
+        // -------------------------------------------------------------
+        function openSupabaseConfigModal() {
+            const storedUrl = appStorage.getItem('MY_SUPABASE_URL') || '';
+            const storedKey = appStorage.getItem('MY_SUPABASE_ANON_KEY') || '';
+            
+            document.getElementById('config-supabase-url').value = storedUrl === 'YOUR_SUPABASE_URL' ? '' : storedUrl;
+            document.getElementById('config-supabase-key').value = storedKey === 'YOUR_SUPABASE_ANON_KEY' ? '' : storedKey;
+            
+            document.getElementById('supabase-config-modal').classList.remove('hidden');
+        }
+
+        function closeSupabaseConfigModal() {
+            document.getElementById('supabase-config-modal').classList.add('hidden');
+        }
+
+        function saveSupabaseConfig() {
+            const urlInput = document.getElementById('config-supabase-url').value.trim();
+            const keyInput = document.getElementById('config-supabase-key').value.trim();
+
+            if (!urlInput || !keyInput) {
+                alert('សូមបំពេញ URL និង Anon Key ទាំងពីរឱ្យបានគ្រប់ជ្រុងជ្រោយ!');
+                return;
+            }
+
+            appStorage.setItem('MY_SUPABASE_URL', urlInput);
+            appStorage.setItem('MY_SUPABASE_ANON_KEY', keyInput);
+            
+            alert('រក្សាទុកបានជោគជ័យ! ប្រព័ន្ធនឹងដំណើរការឡើងវិញដើម្បីតភ្ជាប់ទៅកាន់ Supabase របស់អ្នក។');
+            location.reload();
+        }
+
+        function clearSupabaseConfig() {
+            appStorage.removeItem('MY_SUPABASE_URL');
+            appStorage.removeItem('MY_SUPABASE_ANON_KEY');
+            alert('បានសម្អាត និងស្តារឡើងវិញទៅកាន់ជម្រើសដើម (Sandbox Mode)!');
+            location.reload();
         }
 
         // Adjust banner and badged statuses depending on connection mode
@@ -782,6 +918,11 @@
             
             // Render default dashboard views
             appBootSequence();
+
+            // Refresh icons in case we have active non-transformed ones
+            setTimeout(() => {
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }, 100);
         });
 
 
@@ -789,13 +930,13 @@
         // SANDBOX / LOCAL STORAGE DATA INITIALIZER OR SEEDING
         // -------------------------------------------------------------
         function initLocalStorageData() {
-            if (!localStorage.getItem('wedding_admins')) {
-                localStorage.setItem('wedding_admins', JSON.stringify([
+            if (!appStorage.getItem('wedding_admins')) {
+                appStorage.setItem('wedding_admins', JSON.stringify([
                     { id: 'adm-f7d928', username: 'admin123', password: 'password123' }
                 ]));
             }
-            if (!localStorage.getItem('wedding_events')) {
-                localStorage.setItem('wedding_events', JSON.stringify([
+            if (!appStorage.getItem('wedding_events')) {
+                appStorage.setItem('wedding_events', JSON.stringify([
                     { 
                         id: 'event-09ae48a2', 
                         title: 'ពិធីការមង្គលការ ដេវីដ & គីមហុង 🌸', 
@@ -814,8 +955,8 @@
                     }
                 ]));
             }
-            if (!localStorage.getItem('wedding_guests')) {
-                localStorage.setItem('wedding_guests', JSON.stringify([
+            if (!appStorage.getItem('wedding_guests')) {
+                appStorage.setItem('wedding_guests', JSON.stringify([
                     { id: 'gst-11', wedding_id: 'event-09ae48a2', name: 'ឧកញ៉ា សុខ សារ៉ាវ៉ាន់', phone: '012999888', companions: 2, relation_type: 'ខាងកូនកំលោះ', amount: 150.00, note: 'សូមជូនពរក្មួយទាំងពីរជួបតែសុភមង្គលត្រជាក់ត្រជុំ!', status: 'approved', created_at: new Date('2026-05-28T10:00:00Z').toISOString() },
                     { id: 'gst-12', wedding_id: 'event-09ae48a2', name: 'ម៉ៅ ដានីល', phone: '098445566', companions: 1, relation_type: 'ខាងកូនក្រមុំ', amount: 50.00, note: 'ជូនពរឱ្យស្រលាញ់គ្នាដល់ចាស់កោងខ្នងណា៎!', status: 'pending', created_at: new Date('2026-05-28T12:05:00Z').toISOString() },
                     { id: 'gst-13', wedding_id: 'event-09ae48a2', name: 'ជា សំណាង', phone: '097887766', companions: 0, relation_type: 'មិត្តភក្តិ', amount: 30.00, note: 'ជូនពរមានសុភមង្គលកូនច្រើនៗ!', status: 'approved', created_at: new Date('2026-05-28T13:40:00Z').toISOString() },
@@ -837,21 +978,41 @@
                 if (error) throw error;
                 return data;
             } else {
-                return JSON.parse(localStorage.getItem('wedding_events') || '[]');
+                return JSON.parse(appStorage.getItem('wedding_events') || '[]');
             }
         }
 
         async function apiGetGuests(weddingId) {
             if (!isMockDb) {
-                let query = supabaseClient.from('guests').select('*');
-                if (weddingId) {
-                    query = query.eq('wedding_id', weddingId);
+                let allGuests = [];
+                let from = 0;
+                let to = 999;
+                let hasMore = true;
+                const batchSize = 1000;
+
+                while (hasMore) {
+                    let query = supabaseClient.from('guests').select('*').range(from, to);
+                    if (weddingId) {
+                        query = query.eq('wedding_id', weddingId);
+                    }
+                    const { data, error } = await query.order('created_at', { ascending: false });
+                    if (error) throw error;
+
+                    if (data && data.length > 0) {
+                        allGuests = allGuests.concat(data);
+                        if (data.length < batchSize) {
+                            hasMore = false;
+                        } else {
+                            from += batchSize;
+                            to += batchSize;
+                        }
+                    } else {
+                        hasMore = false;
+                    }
                 }
-                const { data, error } = await query.order('created_at', { ascending: false });
-                if (error) throw error;
-                return data;
+                return allGuests;
             } else {
-                const list = JSON.parse(localStorage.getItem('wedding_guests') || '[]');
+                const list = JSON.parse(appStorage.getItem('wedding_guests') || '[]');
                 if (weddingId) {
                     return list.filter(item => item.wedding_id === weddingId);
                 }
@@ -868,14 +1029,14 @@
                 if (error) throw error;
                 return data[0];
             } else {
-                const list = JSON.parse(localStorage.getItem('wedding_events') || '[]');
+                const list = JSON.parse(appStorage.getItem('wedding_events') || '[]');
                 const newEvent = {
                     id: 'event-' + Math.random().toString(36).substr(2, 9),
                     created_at: new Date().toISOString(),
                     ...event
                 };
                 list.unshift(newEvent);
-                localStorage.setItem('wedding_events', JSON.stringify(list));
+                appStorage.setItem('wedding_events', JSON.stringify(list));
                 return newEvent;
             }
         }
@@ -889,14 +1050,14 @@
                 if (error) throw error;
                 return data[0];
             } else {
-                const list = JSON.parse(localStorage.getItem('wedding_guests') || '[]');
+                const list = JSON.parse(appStorage.getItem('wedding_guests') || '[]');
                 const newGuest = {
                     id: 'gst-' + Math.random().toString(36).substr(2, 9),
                     created_at: new Date().toISOString(),
                     ...guest
                 };
                 list.unshift(newGuest);
-                localStorage.setItem('wedding_guests', JSON.stringify(list));
+                appStorage.setItem('wedding_guests', JSON.stringify(list));
                 return newGuest;
             }
         }
@@ -911,11 +1072,11 @@
                 if (error) throw error;
                 return data[0];
             } else {
-                const list = JSON.parse(localStorage.getItem('wedding_guests') || '[]');
+                const list = JSON.parse(appStorage.getItem('wedding_guests') || '[]');
                 const idx = list.findIndex(g => g.id === guestId);
                 if (idx !== -1) {
                     list[idx].status = 'approved';
-                    localStorage.setItem('wedding_guests', JSON.stringify(list));
+                    appStorage.setItem('wedding_guests', JSON.stringify(list));
                     return list[idx];
                 }
                 throw new Error("Guest ID not located in Sandbox database");
@@ -932,9 +1093,9 @@
                 if (error) throw error;
                 return data;
             } else {
-                const list = JSON.parse(localStorage.getItem('wedding_guests') || '[]');
+                const list = JSON.parse(appStorage.getItem('wedding_guests') || '[]');
                 const filtered = list.filter(g => g.id !== guestId);
-                localStorage.setItem('wedding_guests', JSON.stringify(filtered));
+                appStorage.setItem('wedding_guests', JSON.stringify(filtered));
                 return true;
             }
         }
@@ -949,7 +1110,7 @@
                 if (error) throw error;
                 return data && data.length > 0;
             } else {
-                const list = JSON.parse(localStorage.getItem('wedding_admins') || '[]');
+                const list = JSON.parse(appStorage.getItem('wedding_admins') || '[]');
                 return list.some(adm => adm.username === user && adm.password === pass);
             }
         }
@@ -964,7 +1125,7 @@
                 if (error) throw error;
                 return data && data.length > 0 ? data[0] : null;
             } else {
-                const list = JSON.parse(localStorage.getItem('wedding_events') || '[]');
+                const list = JSON.parse(appStorage.getItem('wedding_events') || '[]');
                 const match = list.find(w => w.host_username === user && w.host_password === pass);
                 return match || null;
             }
@@ -1225,7 +1386,7 @@
                 const authenticated = await apiLoginAdmin(user, pass);
                 if (authenticated) {
                     isAdminLoggedIn = true;
-                    localStorage.setItem('wedding_is_admin', 'true');
+                    appStorage.setItem('wedding_is_admin', 'true');
                     syncAdminWorkspaceState();
                 } else {
                     alert("ឈ្មោះអ្នកប្រើប្រាស់ ឬ លេខកូដសម្ងាត់មិនត្រឹមត្រូវទេ!");
@@ -1238,7 +1399,7 @@
 
         function handleAdminLogout() {
             isAdminLoggedIn = false;
-            localStorage.removeItem('wedding_is_admin');
+            appStorage.removeItem('wedding_is_admin');
             syncAdminWorkspaceState();
         }
 
@@ -1247,7 +1408,7 @@
             const dashboardWorkspace = document.getElementById('admin-dashboard-workspace');
 
             // Quick auto load state checked against cache memory storage
-            const persistedAdminState = localStorage.getItem('wedding_is_admin');
+            const persistedAdminState = appStorage.getItem('wedding_is_admin');
             if (persistedAdminState === 'true') {
                 isAdminLoggedIn = true;
             }
@@ -1530,7 +1691,7 @@
                 if (weddingMatch) {
                     isHostLoggedIn = true;
                     hostSelectedWedding = weddingMatch;
-                    localStorage.setItem('wedding_host_session', JSON.stringify(weddingMatch));
+                    appStorage.setItem('wedding_host_session', JSON.stringify(weddingMatch));
                     syncHostWorkspaceState();
                 } else {
                     alert("គណនី ឬលេខសម្ងាត់របស់ម្ចាស់ដើមការមិនត្រឹមត្រូវទេ!");
@@ -1544,7 +1705,7 @@
         function handleHostLogout() {
             isHostLoggedIn = false;
             hostSelectedWedding = null;
-            localStorage.removeItem('wedding_host_session');
+            appStorage.removeItem('wedding_host_session');
             syncHostWorkspaceState();
         }
 
@@ -1553,7 +1714,7 @@
             const dashboardWorkspace = document.getElementById('host-dashboard-workspace');
 
             // Quick load state from session storage
-            const cachedSession = localStorage.getItem('wedding_host_session');
+            const cachedSession = appStorage.getItem('wedding_host_session');
             if (cachedSession) {
                 hostSelectedWedding = JSON.parse(cachedSession);
                 isHostLoggedIn = true;
